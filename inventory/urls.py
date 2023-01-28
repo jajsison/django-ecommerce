@@ -1,17 +1,24 @@
 from django.urls import include, path
 from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
 
-from .views import CategoryViewSet, ProductViewSet, StoreView, CartView, CheckoutView
+
 from . import views
 
-router = routers.DefaultRouter()
-router.register(r'category_product', CategoryViewSet)
-router.register(r'product_item', ProductViewSet)
-
 urlpatterns = [
-    path('api/', include(router.urls)),
-    # path('', views.store, name="store"),
-    path('', StoreView.as_view(), name='store'),
-    path('cart/', CartView.as_view(), name='cart'),
-    path('checkout/', CheckoutView.as_view(), name='checkout'),
+    path('', views.home, name='store'),
+
+    path('category-list/', views.category_list, name='category-list'),
+    path('brand-list/', views.brand_list, name='brand-list'),
+    path('product-list/', views.product_list, name='product-list'),
+    path('category-product-list/<int:cat_id>', views.category_product_list,
+         name='category-product-list'),
+    path('brand-product-list/<int:brand_id>', views.brand_product_list,
+         name='brand-product-list'),
+    path('product/<str:slug>/<int:id>',
+         views.product_detail, name='product_detail')
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

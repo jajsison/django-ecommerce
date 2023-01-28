@@ -1,38 +1,57 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from rest_framework import viewsets
+from rest_framework.response import Response
 
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer
+from .models import Category, Product, Banner, Brand
+# from .serializers import CategorySerializer, ProductSerializer
 
 from django.views.generic import TemplateView
 # Create your views here.
 
 
-def store(request):
-    context = {}
-    return render(request, 'store.html', context)
+def home(request):
+    banner = Banner.objects.all().order_by('-id')
+    data = Product.objects.filter(is_featured=True).order_by('-id')
+    return render(request, 'index.html', {'data': data, 'banner': banner})
 
 
-class StoreView(TemplateView):
-    template_name = 'store.html'
+def category_list(request):
+    data = Category.objects.all().order_by('-id')
+    return render(request, 'category-list.html', {'data': data})
 
 
-class CartView(TemplateView):
-    template_name = 'cart.html'
+def brand_list(request):
+    data = Brand.objects.all().order_by('-id')
+    return render(request, 'brand-list.html', {'data': data})
 
 
-class CheckoutView(TemplateView):
-    template_name = 'checkout.html'
+def product_list(request):
+    data = Product.objects.all().order_by('-id')
+    # check catagory from foregin table
+    cats = Product.objects.distinct().values('category__title')
+    brands = Product.objects.distinct().values('brand__title')
+    return render(request, 'product-list.html', {'data': data, 'cats': cats, 'brands': brands, })
+
+# product list according to category
 
 
-class CategoryViewSet(viewsets.ViewSet):
+def category_product_list(request, cat_id):
+    category = Category.objects.get(id=cat_id)
+    data = Product.objects.filter(category=category).order_by('-id')
+    cats = Product.objects.distinct().values('category__title')
+    brands = Product.objects.distinct().values('brand__title')
+    return render(request, 'category-product-list.html', {'data': data, 'cats': cats, 'brands': brands, })
 
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+
+def brand_product_list(request, brand_id):
+    brand = Brand.objects.get(id=brand_id)
+    data = Product.objects.filter(brand=brand).order_by('-id')
+    cats = Product.objects.distinct().values('category__title')
+    brands = Product.objects.distinct().values('brand__title')
+    return render(request, 'brand-product-list.html', {'data': data, 'cats': cats, 'brands': brands, })
 
 
-class ProductViewSet(viewsets.ViewSet):
-
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+def product_detail(request, slug, id):
+    product = Product.objects.get(id=id)
+    return render(request, 'product-detail.html', {'data': product})

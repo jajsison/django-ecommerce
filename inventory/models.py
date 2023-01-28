@@ -1,65 +1,89 @@
 from django.db import models
+from django.utils.html import mark_safe
 from django.utils.text import slugify
+
 
 # Create your models here.
 
+# Banner
+class Banner(models.Model):
+    img = models.ImageField(upload_to="banner_imgs/")
+    alt_text = models.CharField(max_length=300)
 
+    class Meta:
+        verbose_name_plural = '1. Banners'
+
+    def image_tag(self):
+        return mark_safe('<img src="%s" width="100" />' % (self.img.url))
+
+    def __str__(self):
+        return self.alt_text
+
+
+# Category
 class Category(models.Model):
-    category_name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=200, blank=True)
+    title = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="cat_imgs/")
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.category_name)
-        super(Category, self).save(*args, **kwargs)
+    class Meta:
+        verbose_name_plural = '2. Categories'
 
-    def __str__(self):
-        return self.category_name
-
-
-class QuantityVariant(models.Model):
-    variant_name = models.CharField(max_length=100)
+    def image_tag(self):
+        return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
 
     def __str__(self):
-        return self.variant_name
+        return self.title
+
+# Brand
 
 
-class ColorVariant(models.Model):
-    color_name = models.CharField(max_length=100)
-    color_code = models.CharField(max_length=100)
+class Brand(models.Model):
+    title = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="brand_imgs/")
+
+    class Meta:
+        verbose_name_plural = '3. Brands'
+
+    def image_tag(self):
+        return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
 
     def __str__(self):
-        return self.color_name
+        return self.title
 
-
-class SizeVariant(models.Model):
-    size_name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.size_name
+# product
 
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    product_name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='static/products')
-    price = models.CharField(max_length=20)
-    description = models.TextField()
-    stock = models.IntegerField(default=100)
+    title = models.CharField(max_length=100)
 
-    quantity_type = models.ForeignKey(
-        QuantityVariant, blank=True, null=True, on_delete=models.PROTECT)
-    color_type = models.ForeignKey(
-        ColorVariant, blank=True, null=True, on_delete=models.PROTECT)
-    size_type = models.ForeignKey(
-        SizeVariant, blank=True, null=True, on_delete=models.PROTECT)
+    slug = models.CharField(max_length=400)
+    detail = models.TextField()
+    specification = models.TextField()
+
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
 
     class Meta:
-        pass
+        verbose_name_plural = '4. Product'
 
     def __str__(self):
-        return self.product_name
+        return self.title
+
+# Product Attribute
 
 
-class ProductImages(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    image = models.ImageField(upload_to='static/products')
+class ProductAttribute(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    price = models.PositiveBigIntegerField(default=0)
+    image = models.ImageField(upload_to="product_imgs/", null=True)
+
+    class Meta:
+        verbose_name_plural = '5. ProductAttributes'
+
+    def image_tag(self):
+        return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
+
+    def __str__(self):
+        return self.product.title
