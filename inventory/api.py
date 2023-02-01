@@ -22,21 +22,20 @@ class HomeViewSet(viewsets.ViewSet):
 
 
 class ProductViewset(viewsets.ViewSet):
-    # queryset = Product.objects.all()
-    # serializer_class = ProductSerializer
 
     def get_product_list(self, request,):
         data = Product.objects.all().order_by('-id')
-        # check catagory from foregin table
-        cats = Product.objects.distinct().values('category__title')
-        brands = Product.objects.distinct().values('brand__title')
-        return render(request, 'product/product-list.html', {'data': data, 'cats': cats, 'brands': brands, })
+        min_price = Product.objects.aggregate(Min('price'))
+        max_price = Product.objects.aggregate(Min('price'))
+        return render(request, 'product/product-list.html',
+                      {'data': data, ' min_price':  min_price, 'max_price': max_price,
+                       })
 
     def product_detail(self, request, slug, id):
         product = Product.objects.get(id=id)
         related_products = Product.objects.filter(
             category=product.category).exclude(id=id)[:3]
-        return render(request, 'product/product-detail.html', {'product': product, 'related': related_products})
+        return render(request, 'product/product-detail.html', {'data': product, 'related': related_products})
 
     def category_list(self, request):
         data = Category.objects.all().order_by('-id')
@@ -49,25 +48,23 @@ class ProductViewset(viewsets.ViewSet):
     def brand_product_list(self, request, *args, **kwargs):
         brand = Brand.objects.get(id=self.kwargs.get('id'))
         data = Product.objects.filter(brand=brand).order_by('-id')
-        cats = Product.objects.distinct().values('category__title')
-        brands = Product.objects.distinct().values('brand__title')
-        return render(request, 'brand-product-list.html', {'data': data, 'cats': cats, 'brands': brands, })
+
+        return render(request, 'brand/brand-product-list.html', {'data': data})
 
     def category_product_list(self, request, *args, **kwargs):
         category = Category.objects.get(id=self.kwargs.get('id'))
         data = Product.objects.filter(category=category).order_by('-id')
-        cats = Product.objects.distinct().values('category__title')
-        brands = Product.objects.distinct().values('brand__title')
-        return render(request, 'category/category-product-list.html', {'data': data, 'cats': cats, 'brands': brands, })
+
+        return render(request, 'category/category-product-list.html', {'data': data})
 
     def filter_data(self, request, *args, **kwargs):
         categories = request.GET.getlist('category[]')
         brands = request.GET.getlist('brand[]')
-        # minPrice = request.GET['minPrice']
-        # maxPrice = request.GET['maxPrice']
-        # allProducts = Product.objects.all().order_by('-id').distinct()
-        # allProducts = allProducts.filter(productattribute__price__gte=minPrice)
-        # allProducts = allProducts.filter(productattribute__price__lte=maxPrice)
+        minPrice = request.GET['minPrice']
+        maxPrice = request.GET['maxPrice']
+        allProducts = Product.objects.all().order_by('-id').distinct()
+        allProducts = allProducts.filter(productattribute__price__gte=minPrice)
+        allProducts = allProducts.filter(productattribute__price__lte=maxPrice)
         if len(categories) > 0:
             allProducts = allProducts.filter(
                 category__id__in=categories).distinct()
