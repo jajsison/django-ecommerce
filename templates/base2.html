@@ -27,7 +27,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <form class="form-inline my-2 my-lg-0" action="/search">
             <div class="input-group">
-              <input name="q" type="text" class="form-control" placeholder="search"/>
+              <input name="q" type="text" class="form-control" placeholder="Search here"/>
               <div class="input-group-append">
                 <button class="btn btn-dark" type="submit" id="button-addon2">Search</button>
               </div>
@@ -44,22 +44,72 @@
               <a class="nav-link text-white" href="{% url 'brand-list' %}">Brands</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" href="">
+              <a class="nav-link text-white" href="{% url 'cart' %}">
                 <i class="fa fa-shopping-cart"></i>
-                Cart (<span class="cart-list">1</span>)</a>
+                Cart  (<span class="cart-list">{{request.session.cartdata|length}}</span>)</a>
             </li>
+            
+            <!--  Login -->
+          
+            {% comment %} <button type="button" class="btn btn-info btn-round" data-toggle="modal" data-target="#loginModal">
+              Login
+            </button>  
+
+            <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header border-bottom-0">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="form-title text-center">
+                      <h4>Login</h4>
+                    </div>
+                    <div class="d-flex flex-column text-center">
+                      <form method="POST" action="{% url 'users:login2' %}" enctype= "multipart/form-data" id="login-form" novalidate>
+                        {% csrf_token %}
+                        <div class="form-group">
+                         
+                          <input type="email" class="form-control"  name="email"id="email"placeholder="Your email address...">
+                        </div>
+                        <div class="form-group">
+                          <input type="password" class="form-control" name="password"id="password" placeholder="Your password...">
+                        </div>
+                        <button type="button" class="btn btn-info btn-block btn-round" id ="slogin">Login</button>
+                        <div class="modal-footer d-flex justify-content-center">
+                          <div class="signup-section">Not a member yet? <a href="{% url 'users:register' %}" class="text-info"> Sign Up</a>.</div>
+                        </div>
+                      </form>
+                      
+                    </div>
+                  </div>
+                </div>
+                 
+              </div>
+            </div> {% endcomment %}
+            
+             <!--  Login -->
+
+          
             <li class="nav-item dropdown">
               <a class="nav-link text-white dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-user"></i>
+                
                 My Account
               </a>
+             
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% if user.is_authenticated %}
-                  <a class="dropdown-item" href="">Dashboard</a>
-                  <a class="dropdown-item" href="">Logout</a>
+                  <a class="dropdown-item" href="/">Dashboard</a>
+                  <a class="dropdown-item" href="">Add Product</a>
+                  <a class="dropdown-item" href="">Update Profile</a>
+                  <a class="dropdown-item" href="{% url 'users:logout' %}" id="logout">Logout</a>
                 {% else %}
-                  <a class="dropdown-item" href="">Login</a>
-                  <a class="dropdown-item" href="">Signup</a>
+                  {% comment %} <a class="dropdown-item" data-toggle="modal" data-target="#loginModal" >Login</a> {% endcomment %}
+                  <a class="dropdown-item" href="{% url 'users:login' %}" >Login</a>
+                  <a class="dropdown-item" href="{% url 'users:register' %}">Signup</a>
                 {% endif %}
               </div>
             </li>
@@ -69,6 +119,9 @@
     </nav>
 
     {% block content %}{% endblock %}
+    {% block javascript %}
+    <script src="{% static 'js/login.js' %}"></script>
+    {% endblock%}
 
     {% comment %} <footer class="pt-4 my-md-5 pt-md-5 border-top container">
       <div class="row">

@@ -23,34 +23,36 @@ $(document).ready(function () {
       "X-CSRFToken": getCookie("csrftoken"),
     },
   });
-});
-console.log("hello");
-$(document).on("submit", "#reg-form", function (e) {
-  console.log("hello");
 
-  e.preventDefault();
-  var action = $(this).attr("action");
-  var register_data = $(this).serialize();
-  console.log($(this).serialize());
-  var url = "http://127.0.0.1:8000/account/register2/";
-  $.ajax({
-    method: "POST",
-    url: action,
-    data: register_data,
-  })
-    .done(function (response) {
-      window.location.href = "";
+  $(document).on("submit", "#add_product_form", function (e) {
+    console.log("hello");
+
+    e.preventDefault();
+    var action = $(this).attr("action");
+    var product_data = $(this).serialize();
+    console.log($(this).serialize());
+
+    $.ajax({
+      method: "POST",
+      url: action,
+      data: product_data,
     })
-    .fail(function (response) {
-      var error_template = "<br><ul><li> This Field is required </li></ul>";
-      $(".error-register").html(error_template);
-    });
+      .done(function (response) {
+        window.location.href = "";
+      })
+
+      .fail(function (response) {
+        var error_template = "<br><ul><li> This Field is required </li></ul>";
+        $(".error-add-product").html(error_template);
+        console.log($(this).serialize());
+      });
+  });
 });
 
-// $("#register").click(function () {
+// $("#product_submit").submit(function () {
 //   $.ajax({
 //     method: "POST",
-//     url: "http://127.0.0.1:8000/account/register2/",
+//     url: "http://127.0.0.1:8000/account/api-product/",
 //     data: {
 //       csrf_token: $("input[name=_token]").val(),
 //       email: $("input[name=email]").val(),
@@ -58,7 +60,7 @@ $(document).on("submit", "#reg-form", function (e) {
 //       password2: $("input[name=password2]").val(),
 //     },
 //     success: function (data) {
-//       console.log(password);
+//       console.log("hello");
 //       location.reload();
 //     },
 //     error: function (data) {

@@ -83,6 +83,7 @@ $(document).ready(function () {
     var _productImage = $(".product-image-" + _index).val();
     var _productTitle = $(".product-title-" + _index).val();
     var _productPrice = $(".product-price-" + _index).text();
+    console.log(_qty, _productId, _productTitle);
     // Ajax
     $.ajax({
       url: "/add-to-cart",

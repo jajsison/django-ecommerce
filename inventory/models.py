@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.html import mark_safe
 from django.utils.text import slugify
+from users.models import CustomUser
 
 
 # Create your models here.
@@ -55,11 +56,12 @@ class Brand(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=100)
-
+    vendor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    price = price = models.PositiveBigIntegerField(default=0)
+    image = models.ImageField(upload_to="product_imgs/", null=True)
     slug = models.CharField(max_length=400)
     detail = models.TextField()
     specification = models.TextField()
-
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)
@@ -71,19 +73,49 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-# Product Attribute
+
+# Order
+status_choice = (
+    ('process', 'In Process'),
+    ('shipped', 'Shipped'),
+    ('delivered', 'Delivered'),
+)
 
 
-class ProductAttribute(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    price = models.PositiveBigIntegerField(default=0)
-    image = models.ImageField(upload_to="product_imgs/", null=True)
+class CartOrder(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    total_amt = models.FloatField()
+    paid_status = models.BooleanField(default=False)
+    order_dt = models.DateTimeField(auto_now_add=True)
+    order_status = models.CharField(
+        choices=status_choice, default='process', max_length=150)
 
     class Meta:
-        verbose_name_plural = '5. ProductAttributes'
+        verbose_name_plural = '5. Orders'
+
+# OrderItems
+
+
+class CartOrderItems(models.Model):
+    order = models.ForeignKey(CartOrder, on_delete=models.CASCADE)
+    invoice_no = models.CharField(max_length=150)
+    item = models.CharField(max_length=150)
+    image = models.CharField(max_length=200)
+    qty = models.IntegerField()
+    price = models.FloatField()
+    total = models.FloatField()
+
+    class Meta:
+        verbose_name_plural = '6. Order Items'
 
     def image_tag(self):
-        return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
+        return mark_safe('<img src="/media/%s" width="50" height="50" />' % (self.image))
 
-    def __str__(self):
-        return self.product.title
+
+# WishList
+class Wishlist(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = 'Wishlist'

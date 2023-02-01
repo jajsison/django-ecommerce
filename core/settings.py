@@ -70,16 +70,16 @@ REST_KNOX = {
 }
 
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.BasicAuthentication',
-#         # 'rest_framework.authentication.SessionAuthentication',
-#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
-#     ],
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         # 'rest_framework_simplejwt.authentication.JWTAuthentication'
-#     ],
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ],
+}
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -184,4 +184,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 LOGIN_REDIRECT_URL = 'index'
-LOGIN_REDIRECT_URL = 'login'
+# LOGIN_REDIRECT_URL = 'login'
