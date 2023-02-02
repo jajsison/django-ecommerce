@@ -5,25 +5,64 @@
 {% block content %}
 
   <main class="container my-4">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter" id="id">
+      Add Brand
+    </button>
 
-    <h3 class="my-4 border-bottom pb-1">Brands
-    </h3>
-    <div class="row">
-      {% if data %}
-        {% for brand in data %}
-          <div class="col-md-3 mb-4">
-            <div class="card shadow">
-              <a href="/brand-product-list/{{brand.id}}"><img src="/media/{{ brand.image }}" class="card-img-top" alt="{{brand.title}}"/></a>
-              <div class="card-body">
-                <h6 class="card-text">
-                  <a href="#">{{brand.title}}</a>
-                </h6>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalCenterTitle">Add Brand</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="add_brand_form" action="{% url 'api-brand' %}" enctype="multipart/form-data" method="POST" novalidate="novalidate">
+              {% csrf_token %}
+
+              <div class="form-group">
+                <label for="inputTitle">Title</label>
+                <input type="text" name="title" class="form-control" id="inputTitle" placeholder="Title">
+
               </div>
+              <div class="form-group">
+                <label for="exampleFormControlFile1">Select an image</label>
+                <input type="file" name="image" multiple="multiple" accept="image/*" class="form-control-file" id="exampleFormControlFile1">
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" id="product_submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--end of modal -->
+  <h3 class="my-4 border-bottom pb-1">Brands
+  </h3>
+  <div class="row">
+
+    {% if data %}
+      {% for brand in data %}
+        <div class="col-md-3 mb-4">
+          <div class="card shadow">
+            <a href="/brand-product-list/{{brand.id}}"><img src="/media/{{ brand.image }}" class="card-img-top" alt="{{brand.title}}"/></a>
+            <div class="card-body">
+              <h6 class="card-text">
+                <a href="#">{{brand.title}}</a>
+              </h6>
             </div>
           </div>
-        {% endfor %}
-      {% endif %}
+        </div>
+      {% endfor %}
+    {% endif %}
 
-    </div>
-  </main>
+  </div>
+</main>
 {% endblock %}

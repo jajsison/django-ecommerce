@@ -58,7 +58,7 @@ urlpatterns = [
 
 
     path('api-brand/',
-         CategoryView.as_view({'get': 'get', 'post': 'create'}), name='api-brand'),
+         BrandView.as_view({'get': 'get', 'post': 'create'}), name='api-brand'),
 
 
 
