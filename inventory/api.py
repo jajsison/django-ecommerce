@@ -21,6 +21,13 @@ class HomeViewSet(viewsets.ViewSet):
         return render(request, 'index.html', {'data': data, 'banner': banner, 'cats': cats, 'brands': brands})
 
 
+class SearchView(viewsets.ViewSet):
+    def search(self, request):
+        q = request.GET.get('q')
+        data = Product.objects.filter(title__icontains=q).order_by('-id')
+        return render(request, 'search.html', {'data': data})
+
+
 class ProductViewset(viewsets.ViewSet):
 
     def get_product_list(self, request,):
@@ -73,82 +80,6 @@ class ProductViewset(viewsets.ViewSet):
 
         t = render_to_string('ajax/product-list.html', {'data': allProducts})
         return JsonResponse({'data': t})
-
-    # def create_product(request):
-
-
-class CartView(viewsets.ViewSet):
-
- # Add to cart
-    def addCart(self, request):
-        cart_p = {}
-        cart_p[str(request.GET['id'])] = {
-            'image': request.GET['image'],
-            'title': request.GET['title'],
-            'qty': request.GET['qty'],
-
-            'price': request.GET['price'],
-        }
-        if 'cartdata' in request.session:
-            if str(request.GET['id']) in request.session['cartdata']:
-                cart_data = request.session['cartdata']
-                cart_data[str(request.GET['id'])]['qty'] = int(
-                    cart_p[str(request.GET['id'])]['qty'])
-                cart_data.update(cart_data)
-                request.session['cartdata'] = cart_data
-            else:
-                cart_data = request.session['cartdata']
-                cart_data.update(cart_p)
-                request.session['cartdata'] = cart_data
-
-        else:
-            request.session['cartdata'] = cart_p
-        return JsonResponse({'data': request.session['cartdata'], 'totalitems': len(request.session['cartdata'])})
-
-    # Cart List Page
-
-    def cart_list(self, request):
-        total_amt = 0
-        if 'cartdata' in request.session:
-            for p_id, item in request.session['cartdata'].items():
-                total_amt += int(item['qty'])*float(item['price'])
-            return render(request, 'cart.html', {'cart_data': request.session['cartdata'], 'totalitems': len(request.session['cartdata']), 'total_amt': total_amt})
-        else:
-            return render(request, 'cart.html', {'cart_data': '', 'totalitems': 0, 'total_amt': total_amt})
-
-    # Delete Cart Item
-
-    def delete_cart_item(request):
-        p_id = str(request.GET['id'])
-        if 'cartdata' in request.session:
-            if p_id in request.session['cartdata']:
-                cart_data = request.session['cartdata']
-                del request.session['cartdata'][p_id]
-                request.session['cartdata'] = cart_data
-        total_amt = 0
-        for p_id, item in request.session['cartdata'].items():
-            total_amt += int(item['qty'])*float(item['price'])
-        t = render_to_string('ajax/cart-list.html', {'cart_data': request.session['cartdata'], 'totalitems': len(
-            request.session['cartdata']), 'total_amt': total_amt})
-        return JsonResponse({'data': t, 'totalitems': len(request.session['cartdata'])})
-
-# Delete Cart Item
-
-
-def update_cart_item(request):
-    p_id = str(request.GET['id'])
-    p_qty = request.GET['qty']
-    if 'cartdata' in request.session:
-        if p_id in request.session['cartdata']:
-            cart_data = request.session['cartdata']
-            cart_data[str(request.GET['id'])]['qty'] = p_qty
-            request.session['cartdata'] = cart_data
-    total_amt = 0
-    for p_id, item in request.session['cartdata'].items():
-        total_amt += int(item['qty'])*float(item['price'])
-    t = render_to_string('ajax/cart-list.html', {'cart_data': request.session['cartdata'], 'totalitems': len(
-        request.session['cartdata']), 'total_amt': total_amt})
-    return JsonResponse({'data': t, 'totalitems': len(request.session['cartdata'])})
 
 
 class ProductView(viewsets.ViewSet):
@@ -258,3 +189,78 @@ class BrandView(viewsets.ViewSet):
             return Response({"status": "success", "data": serializer.data})
         else:
             return Response({"status": "error", "data": serializer.errors})
+
+
+class CartView(viewsets.ViewSet):
+
+ # Add to cart
+    def addCart(self, request):
+        cart_p = {}
+        cart_p[str(request.GET['id'])] = {
+            'image': request.GET['image'],
+            'title': request.GET['title'],
+            'qty': request.GET['qty'],
+
+            'price': request.GET['price'],
+        }
+        if 'cartdata' in request.session:
+            if str(request.GET['id']) in request.session['cartdata']:
+                cart_data = request.session['cartdata']
+                cart_data[str(request.GET['id'])]['qty'] = int(
+                    cart_p[str(request.GET['id'])]['qty'])
+                cart_data.update(cart_data)
+                request.session['cartdata'] = cart_data
+            else:
+                cart_data = request.session['cartdata']
+                cart_data.update(cart_p)
+                request.session['cartdata'] = cart_data
+
+        else:
+            request.session['cartdata'] = cart_p
+        return JsonResponse({'data': request.session['cartdata'], 'totalitems': len(request.session['cartdata'])})
+
+    # Cart List Page
+
+    def cart_list(self, request):
+        total_amt = 0
+        if 'cartdata' in request.session:
+            for p_id, item in request.session['cartdata'].items():
+                total_amt += int(item['qty'])*float(item['price'])
+            return render(request, 'cart.html', {'cart_data': request.session['cartdata'], 'totalitems': len(request.session['cartdata']), 'total_amt': total_amt})
+        else:
+            return render(request, 'cart.html', {'cart_data': '', 'totalitems': 0, 'total_amt': total_amt})
+
+    # Delete Cart Item
+
+    def delete_cart_item(self, request):
+        p_id = str(request.GET['id'])
+        if 'cartdata' in request.session:
+            if p_id in request.session['cartdata']:
+                cart_data = request.session['cartdata']
+                del request.session['cartdata'][p_id]
+                request.session['cartdata'] = cart_data
+        total_amt = 0
+        for p_id, item in request.session['cartdata'].items():
+            total_amt += int(item['qty'])*float(item['price'])
+        t = render_to_string('ajax/cart-list.html', {'cart_data': request.session['cartdata'], 'totalitems': len(
+            request.session['cartdata']), 'total_amt': total_amt})
+        return JsonResponse({'data': t, 'totalitems': len(request.session['cartdata'])})
+
+
+# Delete Cart Item
+
+
+    def update_cart_item(self, request):
+        p_id = str(request.GET['id'])
+        p_qty = request.GET['qty']
+        if 'cartdata' in request.session:
+            if p_id in request.session['cartdata']:
+                cart_data = request.session['cartdata']
+                cart_data[str(request.GET['id'])]['qty'] = p_qty
+                request.session['cartdata'] = cart_data
+        total_amt = 0
+        for p_id, item in request.session['cartdata'].items():
+            total_amt += int(item['qty'])*float(item['price'])
+        t = render_to_string('ajax/cart-list.html', {'cart_data': request.session['cartdata'], 'totalitems': len(
+            request.session['cartdata']), 'total_amt': total_amt})
+        return JsonResponse({'data': t, 'totalitems': len(request.session['cartdata'])})

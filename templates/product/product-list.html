@@ -30,8 +30,11 @@
                       <span class="product-price-{{product.id}}">{{product.price}}</span></h6>
                   </div>
                   <div class="card-footer">
-
-                    <button class="btn btn-sm btn-primary">
+                    <input type="hidden" value="1" class="form-control product-qty-{{product.id}}" id="productQty"/>
+                    <input type="hidden" class="product-image-{{product.id}}" value="{{product.image}}"/>
+                    <input type="hidden" class="product-id-{{product.id}}" value="{{product.id}}"/>
+                    <input type="hidden" class="product-title-{{product.id}}" value="{{product.title}}"/>
+                    <button class="btn btn-sm btn-primary add-to-cart" data-index="{{product.id}}">
                       <i class="fa fa-shopping-cart"></i>
                     </button>
                     <button class="btn btn-sm btn-danger">
